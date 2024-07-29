@@ -126,7 +126,7 @@ let postInit = true
 function gameUpdate() {
     if (postInit) {
         postInit = false
-        addPlatforms()
+        // addPlatforms()
         drawElementBoxes()
     }
 }
@@ -213,57 +213,57 @@ function createBoxFromElement(element, position = 'bottom') {
     return box;
 }
 
-function addPlatforms() {
-    const platformContainer = document.querySelector('.platform-container');
-    platformContainer.innerHTML = ''; // Clear existing platforms
+// function addPlatforms() {
+//     const platformContainer = document.querySelector('.platform-container');
+//     platformContainer.innerHTML = ''; // Clear existing platforms
 
-    const windowHeight = window.innerHeight;
-    const windowWidth = window.innerWidth;
-    const groundHeight = 50; // Height of the ground element
-    const minSpaceForPlatforms = 300; // Minimum space required to add platforms
-    const platformHeight = 20;
-    const platformWidth = 150;
-    const spacing = 50; // Minimum space between platforms
+//     const { bottom: gameListBottom } = document.querySelector('.game-list').getBoundingClientRect()
 
-    // Check if there's enough space for platforms
-    if (windowHeight - groundHeight < minSpaceForPlatforms) {
-        return; // Don't add platforms if there's not enough space
-    }
+//     const windowWidth = window.innerWidth
+//     const groundHeight = 50; // Height of the ground element
+//     const minSpaceForPlatforms = 100; // Minimum space required to add platforms
+//     const platformHeight = 20;
+//     const platformWidth = 150;
+//     const spacing = 50; // Minimum space between platforms
 
-    const availableSpace = windowHeight - groundHeight - 300; // Leave some space at the top
-    const numPlatforms = Math.floor(availableSpace / spacing) - 1;
+//     const availableSpace = gameListBottom - groundHeight
+//     if (availableSpace < minSpaceForPlatforms) {
+//         return; // Don't add platforms if there's not enough space
+//     }
 
-    for (let i = 0; i < numPlatforms; i++) {
-        const platform = document.createElement('div');
-        platform.className = 'platform';
+//     const numPlatforms = Math.floor(availableSpace / spacing);
 
-        // Alternate left and right
-        const left = windowWidth / 2 + (i % 2 ? 1 : -1) * platformWidth / 2 - platformWidth / 2
+//     for (let i = 0; i < numPlatforms; i++) {
+//         const platform = document.createElement('div');
+//         platform.className = 'platform';
 
-        let previousBottom = 0
-        if (platformContainer.lastChild)
-            previousBottom = parseFloat(platformContainer.lastChild.style.bottom);
-        const bottom = previousBottom + spacing;
+//         // Alternate left and right
+//         const left = windowWidth / 2 + (i % 2 ? 1 : -1) * platformWidth / 2 - platformWidth / 2
 
-        platform.style.cssText = `
-            position: absolute;
-            width: ${platformWidth}px;
-            height: ${platformHeight}px;
-            left: ${left}px;
-            bottom: ${bottom}px;
-            background-color: var(--button);
-            border: 2px solid var(--ground);
-        `;
+//         let previousBottom = 0
+//         if (platformContainer.lastChild)
+//             previousBottom = parseFloat(platformContainer.lastChild.style.bottom);
+//         const bottom = previousBottom + spacing;
 
-        platformContainer.appendChild(platform);
-    }
-}
+//         platform.style.cssText = `
+//             position: absolute;
+//             width: ${platformWidth}px;
+//             height: ${platformHeight}px;
+//             left: ${left}px;
+//             bottom: ${bottom}px;
+//             background-color: var(--button);
+//             border: 2px solid var(--ground);
+//         `;
+
+//         platformContainer.appendChild(platform);
+//     }
+// }
 
 function handleResize() {
-    requestAnimationFrame(() => {
-        addPlatforms()
-        requestAnimationFrame(drawElementBoxes)
-    })
+    // requestAnimationFrame(() => {
+    // addPlatforms()
+    requestAnimationFrame(drawElementBoxes)
+    // })
 }
 
 window.addEventListener('resize', handleResize);
