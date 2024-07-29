@@ -357,6 +357,11 @@ function gameInit() {
     pauseMenu.hide();  // Start with pause menu hidden
 
     initPostProcess()
+
+
+    mobileKeyboard.on('input', (code, keyCode, isPressed) => {
+        inputData[0][keyCode] = isPressed ? 3 : 4;
+    });
 }
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
