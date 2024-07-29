@@ -608,49 +608,34 @@ function initPostProcess() {
     const shader = `
     #define SPEED_FACTOR 0.5 // Adjust this value to control overall speed
 
-    float dot2(in vec2 v ) { return dot(v,v); }
-
-    float sdTrapezoid( in vec2 p, in float r1, float r2, float he )
-    {
+    float sdTrapezoid(in vec2 p, in float r1, float r2, float he) {
         vec2 k1 = vec2(r2,he);
         vec2 k2 = vec2(r2-r1,2.0*he);
         p.x = abs(p.x);
         vec2 ca = vec2(p.x-min(p.x,(p.y<0.0)?r1:r2), abs(p.y)-he);
-        vec2 cb = p - k1 + k2*clamp( dot(k1-p,k2)/dot2(k2), 0.0, 1.0 );
+        vec2 cb = p - k1 + k2*clamp( dot(k1-p,k2)/dot(k2,k2), 0.0, 1.0 );
         float s = (cb.x<0.0 && ca.y<0.0) ? -1.0 : 1.0;
-        return s*sqrt( min(dot2(ca),dot2(cb)) );
+        return s*sqrt( min(dot(ca,ca),dot(cb,cb)) );
     }
 
-    float sdLine( in vec2 p, in vec2 a, in vec2 b )
-    {
-        vec2 pa = p-a, ba = b-a;
-        float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-        return length( pa - ba*h );
-    }
-
-    float sdBox( in vec2 p, in vec2 b )
-    {
+    float sdBox(in vec2 p, in vec2 b) {
         vec2 d = abs(p)-b;
         return length(max(d,vec2(0))) + min(max(d.x,d.y),0.0);
     }
 
-    float opSmoothUnion(float d1, float d2, float k){
-        float h = clamp(0.5 + 0.5 * (d2 - d1) /k,0.0,1.0);
-        return mix(d2, d1 , h) - k * h * ( 1.0 - h);
+    float opSmoothUnion(float d1, float d2, float k) {
+        float h = clamp(0.5 + 0.5 * (d2 - d1) / k, 0.0, 1.0);
+        return mix(d2, d1, h) - k * h * (1.0 - h);
     }
 
-    float sdCloud(in vec2 p, in vec2 a1, in vec2 b1, in vec2 a2, in vec2 b2, float w)
-    {
-        //float lineVal1 = smoothstep(w - 0.0001, w, sdLine(p, a1, b1));
-        float lineVal1 = sdLine(p, a1, b1);
-        float lineVal2 = sdLine(p, a2, b2);
+    float sdCloud(in vec2 p, in vec2 a1, in vec2 b1, in vec2 a2, in vec2 b2, float w) {
+        float lineVal1 = length(p - mix(a1, b1, clamp(dot(p - a1, b1 - a1) / dot(b1 - a1, b1 - a1), 0.0, 1.0)));
+        float lineVal2 = length(p - mix(a2, b2, clamp(dot(p - a2, b2 - a2) / dot(b2 - a2, b2 - a2), 0.0, 1.0)));
         vec2 ww = vec2(w*1.5, 0.0);
         vec2 left = max(a1 + ww, a2 + ww);
         vec2 right = min(b1 - ww, b2 - ww);
         vec2 boxCenter = (left + right) * 0.5;
-        //float boxW = right.x - left.x;
         float boxH = abs(a2.y - a1.y) * 0.5;
-        //float boxVal = sdBox(p - boxCenter, vec2(boxW, boxH)) + w;
         float boxVal = sdBox(p - boxCenter, vec2(0.04, boxH)) + w;
         
         float uniVal1 = opSmoothUnion(lineVal1, boxVal, 0.05);
@@ -659,8 +644,7 @@ function initPostProcess() {
         return min(uniVal1, uniVal2);
     }
 
-    float sun(vec2 uv, float battery)
-    {
+    float sun(vec2 uv, float battery) {
         float val = smoothstep(0.3, 0.29, length(uv));
         float bloom = smoothstep(0.7, 0.0, length(uv));
         float cut = 3.0 * sin((uv.y + iTime * 0.1 * SPEED_FACTOR * (battery + 0.02)) * 100.0) 
@@ -669,8 +653,7 @@ function initPostProcess() {
         return clamp(val * cut, 0.0, 1.0) + bloom * 0.6;
     }
 
-    float grid(vec2 uv, float battery)
-    {
+    float grid(vec2 uv, float battery) {
         vec2 size = vec2(uv.y, uv.y * uv.y * 0.2) * 0.01;
         uv += vec2(0.0, iTime * 2.0 * SPEED_FACTOR * (battery + 0.05));
         uv = abs(fract(uv) - 0.5);
@@ -679,53 +662,40 @@ function initPostProcess() {
         return clamp(lines.x + lines.y, 0.0, 3.0);
     }
 
-    void mainImage(out vec4 fragColor, in vec2 fragCoord)
-    {
+    void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         vec2 uv = fragCoord / iResolution.xy;
-
         vec4 originalColor = texture(iChannel0, uv);
 
         vec2 p = (2.0 * uv - 1.0) * iResolution.xy / iResolution.y;
         float battery = 1.0;
         
-        // Grid
-        float fog = smoothstep(0.1, -0.02, abs(p.y + 0.2));
-        vec3 col = vec3(0.0, 0.05, 0.1); // Darker blue base color
-        if (p.y < -0.2)
-        {
+        vec3 col = vec3(0.0, 0.05, 0.1);
+        
+        if (p.y < -0.2) {
             p.y = 3.0 / (abs(p.y + 0.2) + 0.05);
-            p.x *= p.y * 1.0;
+            p.x *= p.y;
             float gridVal = grid(p, battery);
-            col = mix(col, vec3(0.0, 0.2, 0.4), gridVal); // Darker blue for grid
-        }
-        else
-        {
+            col = mix(col, vec3(0.0, 0.2, 0.4), gridVal);
+        } else {
             float fujiD = min(p.y * 4.5 - 0.5, 1.0);
             p.y -= battery * 1.1 - 0.51;
             
-            vec2 sunUV = p;
-            vec2 fujiUV = p;
-            
-            // Sun
-            sunUV += vec2(0.75, 0.2);
-            col = vec3(0.0, 0.1, 0.2); // Darker blue for sky
+            vec2 sunUV = p + vec2(0.75, 0.2);
             float sunVal = sun(sunUV, battery);
             
-            col = mix(col, vec3(0.0, 0.2, 0.4), sunUV.y * 2.0 + 0.2); // Gradient to slightly lighter blue
-            col = mix(vec3(0.0, 0.05, 0.1), col, sunVal); // Mix with very dark blue
+            col = mix(col, vec3(0.0, 0.2, 0.4), sunUV.y * 2.0 + 0.2);
+            col = mix(vec3(0.0, 0.05, 0.1), col, sunVal);
             
-            // fuji
             float fujiVal = sdTrapezoid(p + vec2(-0.75+sunUV.y * 0.0, 0.5), 1.75 + pow(p.y * p.y, 2.1), 0.2, 0.5);
             float waveVal = p.y + sin(p.x * 20.0 + iTime * 0.5 * SPEED_FACTOR) * 0.05 + 0.2;
             float wave_width = smoothstep(0.0, 0.01, waveVal);
             
-            col = mix(col, mix(vec3(0.0, 0.05, 0.1), vec3(0.0, 0.1, 0.2), fujiD), step(fujiVal, 0.0)); // Darker blue shades for Fuji
-            col = mix(col, vec3(0.0, 0.15, 0.3), wave_width * step(fujiVal, 0.0)); // Slightly lighter blue for wave
-            col = mix(col, vec3(0.0, 0.2, 0.4), 1.0 - smoothstep(0.0, 0.01, abs(fujiVal))); // Light blue for Fuji outline
+            col = mix(col, mix(vec3(0.0, 0.05, 0.1), vec3(0.0, 0.1, 0.2), fujiD), step(fujiVal, 0.0));
+            col = mix(col, vec3(0.0, 0.15, 0.3), wave_width * step(fujiVal, 0.0));
+            col = mix(col, vec3(0.0, 0.2, 0.4), 1.0 - smoothstep(0.0, 0.01, abs(fujiVal)));
             
-            col += mix(col, mix(vec3(0.0, 0.1, 0.2), vec3(0.0, 0.05, 0.1), clamp(p.y * 3.5 + 3.0, 0.0, 1.0)), step(0.0, fujiVal)); // Gradient for sky
+            col += mix(col, mix(vec3(0.0, 0.1, 0.2), vec3(0.0, 0.05, 0.1), clamp(p.y * 3.5 + 3.0, 0.0, 1.0)), step(0.0, fujiVal));
             
-            // cloud
             vec2 cloudUV = p;
             cloudUV.x = mod(cloudUV.x + iTime * 0.02 * SPEED_FACTOR, 4.0) - 2.0;
             float cloudTime = iTime * 0.1 * SPEED_FACTOR;
@@ -744,16 +714,12 @@ function initPostProcess() {
             
             float cloudVal = min(cloudVal1, cloudVal2);
             
-            col = mix(col, vec3(0.0, 0.05, 0.1), 1.0 - smoothstep(0.075 - 0.0001, 0.075, cloudVal)); // Darker blue for cloud interior
-            col += vec3(0.0, 0.2, 0.4) * (1.0 - smoothstep(0.0, 0.01, abs(cloudVal - 0.075))); // Light blue for cloud edges
+            col = mix(col, vec3(0.0, 0.05, 0.1), 1.0 - smoothstep(0.075 - 0.0001, 0.075, cloudVal));
+            col += vec3(0.0, 0.2, 0.4) * (1.0 - smoothstep(0.0, 0.01, abs(cloudVal - 0.075)));
         }
 
-        // Overlay original color (game objects) on top of shader effects
-        // Adjust this threshold to match your background color/alpha
-        float threshold = 0.1; // Example threshold, adjust as needed
+        float threshold = 0.1;
         float objectMask = step(threshold, max(max(originalColor.r, originalColor.g), originalColor.b));
-        
-        // Blend the original color over the shader effect where objects are present
         col = mix(col, originalColor.rgb, objectMask);
 
         fragColor = vec4(col, 0.1);
