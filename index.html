@@ -66,7 +66,13 @@
             text-align: center;
             display: flex;
             flex-direction: column;
+            align-items: center;
             height: 100vh;
+        }
+
+        .sub-title {
+            padding-bottom: 10px;
+            width: fit-content;
         }
 
         h1 {
@@ -244,7 +250,7 @@
 </head>
 
 <body class=" crt">
-    <div id="content" class="container">
+    <div class="container">
         <h1>
             <span class="coin">●</span>
             <div>
@@ -253,7 +259,7 @@
             </div>
             <span class="coin">●</span>
         </h1>
-        <p>Japanese language learning games</p>
+        <p class="sub-title">Japanese language learning games</p>
 
         <div class="game-list-container">
             <div class="game-list">
@@ -266,9 +272,6 @@
                     <p>Type the words before they drop</p>
                 </a>
             </div>
-        </div>
-
-        <div class="platform-container">
         </div>
 
         <div class="ground"></div>
