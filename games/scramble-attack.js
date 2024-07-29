@@ -758,14 +758,19 @@ function drawWinScreen() {
 
 engineInit(
     () => {
-        setTouchGamepadEnable(true)
-        setTouchGamepadAnalog(false)
         canvasFixedSize = vec2(1280, 720); // use a 720p fixed size canvas
         levelSize = vec2(20, 38)
         cameraPos = levelSize.scale(0.5)
         initTitleMenu()
         initHpBar()
         glInitPostProcess(shader, true)
+
+        mobileGamepad.on('x', (keyDown) => inputData[0][88] = keyDown ? 3 : 4);
+        mobileGamepad.on('z', (keyDown) => inputData[0][90] = keyDown ? 3 : 4);
+        mobileGamepad.on('left', (keyDown) => inputData[0][37] = keyDown ? 3 : 4);
+        mobileGamepad.on('down', (keyDown) => inputData[0][40] = keyDown ? 3 : 4);
+        mobileGamepad.on('right', (keyDown) => inputData[0][39] = keyDown ? 3 : 4);
+        mobileGamepad.on('up', (keyDown) => inputData[0][38] = keyDown ? 3 : 4);
     },
     () => {
         if (pauseButton) {
