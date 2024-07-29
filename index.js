@@ -116,6 +116,8 @@ function gameInit() {
     mobileGamepad.on('down', (keyDown) => inputData[0][40] = keyDown ? 3 : 4);
     mobileGamepad.on('right', (keyDown) => inputData[0][39] = keyDown ? 3 : 4);
     mobileGamepad.on('up', (keyDown) => inputData[0][38] = keyDown ? 3 : 4);
+
+    ontouchstart = ontouchend = () => { }
 }
 
 let postInit = true
