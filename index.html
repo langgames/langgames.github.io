@@ -5,8 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nihongo Arcade</title>
+    <link rel="preload" href="./fonts/pixelify-sans/PixelifySans-VariableFont_wght.ttf" as="font" type="font/ttf"
+        crossorigin>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @font-face {
+            font-family: 'Pixelify Sans';
+            src: url('./fonts/pixelify-sans/PixelifySans-VariableFont_wght.ttf') format('truetype-variations');
+            font-weight: 100 900;
+        }
 
         :root {
             --sky-light: #DDDDFF;
@@ -20,7 +26,7 @@
 
         body {
             color: var(--text);
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Pixelify Sans', sans-serif;
             margin: 0;
             padding: 20px;
             overflow: hidden;
@@ -140,6 +146,15 @@
             margin: 0 10px;
         }
 
+        .platform-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
         .ground {
             height: 50px;
             background-color: var(--ground);
@@ -216,7 +231,7 @@
     </style>
 </head>
 
-<body class="crt">
+<body class=" crt">
     <div id="content" class="container">
         <h1>
             <span class="coin">●</span>
@@ -239,6 +254,9 @@
                     <p>Type the words before they drop</p>
                 </a>
             </div>
+        </div>
+
+        <div class="platform-container">
         </div>
 
         <div class="ground"></div>
