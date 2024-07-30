@@ -3,7 +3,7 @@
 // Game objects
 let gameState = 'menu'
 let words = [];
-let currentWord = '';
+let currentInput = '';
 let lastCorrectWord = null
 let score = 0;
 let gameOver = false;
@@ -314,7 +314,7 @@ function restartGame() {
 
     words.forEach(w => w.destroy());
     words = [];
-    currentWord = '';
+    currentInput = '';
     score = 0;
     lastCorrectWord = null;
     gameOver = false;
@@ -358,10 +358,6 @@ function gameInit() {
 
     initPostProcess()
 
-
-    mobileKeyboard.on('input', (code, keyCode, isPressed) => {
-        inputData[0][keyCode] = isPressed ? 3 : 4;
-    });
 }
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
@@ -378,8 +374,8 @@ function gameUpdate() {
         }
 
         // Check for completed words
-        if (currentWord) {
-            const matchedWord = words.find(w => w.reading === currentWord);
+        if (currentInput) {
+            const matchedWord = words.find(w => w.reading === currentInput);
             if (matchedWord) {
                 const kanjiWord = kanjiWordList.find(k => k.kanji === matchedWord.kanji && k.reading === matchedWord.reading)
                 if (kanjiWord) {
@@ -389,7 +385,7 @@ function gameUpdate() {
                 matchedWord.destroy();
                 words = words.filter(w => w !== matchedWord);
                 score += matchedWord.reading.length;
-                currentWord = '';
+                currentInput = '';
 
                 hpBar.addHP(10)
 
@@ -437,7 +433,7 @@ function gameRenderPost() {
         // ... (existing game render code)
         // Render UI
         drawText('Score: ' + score, vec2(5, levelSize.y - 1), undefined, primary);
-        drawText(currentWord, vec2(levelSize.x / 2, 1), 1.2, primary, textLineWidth, lineColor);
+        drawText(currentInput, vec2(levelSize.x / 2, 1), 1.2, primary, textLineWidth, lineColor);
 
         // Display remaining words
         const unusedWords = getUnusedWords();
@@ -540,19 +536,19 @@ function gameInputUpdate() {
     for (let i = 65; i <= 90; i++) { // A-Z keys
         if (keyWasPressed(i)) {
             const char = String.fromCharCode(i).toLowerCase();
-            currentWord += char;
+            currentInput += char;
             convertToKana();
         }
     }
 
     if (keyWasPressed(189)) { // -
         const char = '-';
-        currentWord += char;
+        currentInput += char;
         convertToKana();
     }
 
     if (keyWasPressed(8)) { // Backspace
-        currentWord = currentWord.slice(0, -1);
+        currentInput = currentInput.slice(0, -1);
     }
 }
 
@@ -560,8 +556,8 @@ function gameInputUpdate() {
 function convertToKana() {
     let result = '';
     let buffer = '';
-    for (let i = 0; i < currentWord.length; i++) {
-        buffer += currentWord[i];
+    for (let i = 0; i < currentInput.length; i++) {
+        buffer += currentInput[i];
 
         // Check for small tsu (っ)
         if (buffer.length === 2 &&
@@ -594,7 +590,7 @@ function convertToKana() {
         result += buffer;
     }
 
-    currentWord = result;
+    currentInput = result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
