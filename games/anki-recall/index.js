@@ -21,6 +21,9 @@ let grid;
 let sentences;
 let sentDefinition;
 
+const isMobile = checkIsMobile()
+let mobileRecallButton = null
+
 // Color palette
 const PALETTE = {
     white: new Color(0.9, 0.9, 0.9),
@@ -46,6 +49,8 @@ const ColorMenu = (pos, size, title) => new Menu(pos, size, title, {
 })
 
 function startGame() {
+    mobileKeyboard.hide()
+    mobileGamepad.show()
     currentState = GameState.MEMORIZE;
     currSentIndex = nextSentenceIndex(sentences, completed);
     if (currSentIndex === -1) {
@@ -66,6 +71,22 @@ function startGame() {
     grid.reflow()
     grid.select(0)
 
+    if (isMobile) {
+        mobileRecallButton = new Button(
+            cameraPos.add(vec2(0, -9)),
+            vec2(6, 1.5),
+            'RECALL',
+            showType,
+            undefined,
+            {
+                normalColor: PALETTE.darkGray,
+                hoverColor: PALETTE.darkGray,
+                pressedColor: PALETTE.darkGray,
+                textColor: PALETTE.darkGray,
+                borderColor: PALETTE.green
+            })
+    }
+
     currentInput = '';
     sound_start.play();
     hideTitleMenu();
@@ -76,6 +97,20 @@ function showResult() {
     completed.push(currSentIndex);
     save();
     startGame();
+}
+
+function showType() {
+    mobileRecallButton?.destroy()
+    grid.select(0)
+    grid.forEach(w => {
+        w._word = w.word
+        if (w.data.mask) {
+            w.word = '●'
+        }
+    })
+    mobileGamepad.hide()
+    mobileKeyboard.show()
+    currentState = GameState.TYPE;
 }
 
 function showWin() {
@@ -153,14 +188,20 @@ function drawMemorizeScreen() {
     drawCompleted()
     drawSentDefinition()
     drawDefinition()
-    drawText('Press SPACE to recall', cameraPos.add(vec2(0, -9)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
+    if (!isMobile)
+        drawText('Press SPACE to recall', cameraPos.add(vec2(0, -9)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
 }
 
 function drawTypeScreen() {
     drawCompleted()
+
+    const inputPos = cameraPos.add(isMobile ? vec2(-1, 10) : vec2(0, -5))
+    const inputSize = isMobile ? 1 : 2
     const wrappedInput = wrapText(currentInput, 8, 2, '');
-    drawText(wrappedInput, cameraPos.add(vec2(0, -5)), 2, PALETTE.white, 0.2, PALETTE.darkGray);
-    drawText('Press SPACE to skip', cameraPos.add(vec2(-10, 10)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
+    drawText(wrappedInput, inputPos, inputSize, PALETTE.white, 0.2, PALETTE.darkGray);
+
+    const pos = cameraPos.add(isMobile ? vec2(-14, 10) : vec2(0, -9))
+    drawText('Press SPACE to skip', pos, 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
 }
 
 function drawWinScreen() {
@@ -192,6 +233,14 @@ engineInit(
         canvasFixedSize = vec2(1280, 720);
         levelSize = vec2(20, 38);
         cameraPos = levelSize.scale(0.5);
+
+        mobileGamepad.on('x', (keyDown) => inputData[0][88] = keyDown ? 3 : 4);
+        mobileGamepad.on('z', (keyDown) => inputData[0][90] = keyDown ? 3 : 4);
+        mobileGamepad.on('left', (keyDown) => inputData[0][37] = keyDown ? 3 : 4);
+        mobileGamepad.on('down', (keyDown) => inputData[0][40] = keyDown ? 3 : 4);
+        mobileGamepad.on('right', (keyDown) => inputData[0][39] = keyDown ? 3 : 4);
+        mobileGamepad.on('up', (keyDown) => inputData[0][38] = keyDown ? 3 : 4);
+
         initTitleMenu();
         drawShader();
     },
@@ -200,15 +249,8 @@ engineInit(
             case GameState.TITLE:
                 break;
             case GameState.MEMORIZE: {
-                if (keyWasPressed(32)) { // 32 is the keycode for SPACE
-                    grid.select(0)
-                    grid.forEach(w => {
-                        w._word = w.word
-                        if (w.data.mask) {
-                            w.word = '●'
-                        }
-                    })
-                    currentState = GameState.TYPE;
+                if (!isMobile && keyWasPressed(32)) { // 32 is the keycode for SPACE
+                    showType()
                 }
 
                 if (keyIsDown(90)) {
@@ -226,7 +268,6 @@ engineInit(
             }
             case GameState.TYPE: {
                 if (keyWasPressed(32)) { // 32 is the keycode for SPACE
-                    currentState = GameState.MEMORIZE;
                     grid.destroy()
                     startGame()
                 }
