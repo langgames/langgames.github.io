@@ -160,7 +160,7 @@ function drawTypeScreen() {
     drawCompleted()
     const wrappedInput = wrapText(currentInput, 8, 2, '');
     drawText(wrappedInput, cameraPos.add(vec2(0, -5)), 2, PALETTE.white, 0.2, PALETTE.darkGray);
-    drawText('Press SPACE to skip', cameraPos.add(vec2(0, -9)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
+    drawText('Press SPACE to skip', cameraPos.add(vec2(-10, 10)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
 }
 
 function drawWinScreen() {
