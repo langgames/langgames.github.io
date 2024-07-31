@@ -194,6 +194,7 @@ function gameInit() {
     cameraScale = 1
     gravity = -1
 
+    mobileGamepad.showOnDoubleTap()
     mobileGamepad.on('x', (keyDown) => inputData[0][38] = keyDown ? 3 : 4);
     mobileGamepad.on('z', (keyDown) => inputData[0][40] = keyDown ? 3 : 4);
     mobileGamepad.on('left', (keyDown) => inputData[0][37] = keyDown ? 3 : 4);
