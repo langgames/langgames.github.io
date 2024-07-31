@@ -1809,7 +1809,7 @@ const compactSentences =
             "気", "き", "care", "",
             "を", "", "object particle", "no-mask",
             "つける", "", "pay", "",
-            "に越したことはない", "", "there's nothing better than", "",
+            "に越したことはない", "にこしたことはない", "there's nothing better than", "",
             "There's nothing better than taking care of your health."
         ],
         [

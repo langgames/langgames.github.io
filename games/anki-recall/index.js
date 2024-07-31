@@ -118,6 +118,13 @@ function showWin() {
     currentState = GameState.WIN;
     const menu = ColorMenu(cameraPos.add(vec2(0, -7)), vec2(16, 12));
     menu.columns = 1;
+    menu.addButton('Restart level', () => {
+        menu.hide()
+        menu.destroy()
+        clearSave()
+        startGame()
+    });
+
     menu.addButton('Main menu', () => {
         menu.hide()
         menu.destroy()
@@ -340,3 +347,9 @@ function load(level) {
         return [];
     }
 }
+
+function clearSave() {
+    completed = []
+    localStorage.removeItem(`completed_${currentLevel}`);
+}
+
