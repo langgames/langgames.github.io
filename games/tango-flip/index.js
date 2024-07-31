@@ -28,26 +28,29 @@ let mobileRecallButton = null
 // Color palette
 const PALETTE = {
     white: new Color(0.9, 0.9, 0.9),
-    lightGray: new Color(0.8, 0.8, 0.8),
-    gray: new Color(0.5, 0.5, 0.5),
+    grey: new Color(.58, .55, .53),
     darkGray: new Color(0.2, 0.2, 0.2),
-    green: new Color(0.4, 0.5, 0.9),
 };
 
 const sound_start = new Sound([1.7, , 454, .01, .08, .13, 1, 3.7, , , 255, .08, , , , , , .83, .02, , 496]);
-const sound_success = new Sound([2.4, , 95, .03, .07, .33, 2, 3.9, , , , , , .3, , 1, .07, .4, .26, .3]);
-const sound_fail = new Sound([, , 493, , .02, .03, 1, 1.5, , , 41, , , , , , , .63, .01, .36, -1030]);
+const sound_success = new Sound([, , 686, , .1, .11, 1, .7, , , 351, .06, , , , , , .61, .03]);;
+const sound_fail = new Sound([, , 70, .01, .29, .4, 3, 1.2, , , , , , .1, 68, .8, , .45, .07]);
 
 const ColorMenu = (pos, size, title) => new Menu(pos, size, title, {
-    titleColor: PALETTE.green,
+    titleColor: PALETTE.grey,
     titleOutlineColor: PALETTE.darkGray,
-    defaultTextColor: PALETTE.green,
+    defaultTextColor: PALETTE.grey,
     buttonNormalColor: PALETTE.darkGray,
     buttonHoverColor: PALETTE.darkGray,
     buttonPressedColor: PALETTE.darkGray,
     buttonTextColor: PALETTE.darkGray,
-    buttonBorderColor: PALETTE.green
+    buttonBorderColor: PALETTE.grey
 });
+
+const ColorStaticGrid = (rows, cols, words, margin) => new StaticGrid(rows, cols, words, margin, {
+    textColor: PALETTE.grey,
+    selectedCellColor: PALETTE.grey
+})
 
 function startGame() {
     mobileGamepad.show()
@@ -56,11 +59,12 @@ function startGame() {
     categoryIndex = nextValidIndex(categories, completed);
     if (categoryIndex === -1) {
         showResult();
+        return
     }
     initializeGrid();
     selectedIndex = 0;
-    recallIndex = 0;
-    sound_start.play();
+    recallIndex = nextValidIndex(words, []);
+    recallCompleted = [];
     hideTitleMenu();
 }
 
@@ -70,7 +74,7 @@ function initializeGrid() {
     words = category.words;
     if (grid)
         grid.destroy()
-    grid = new StaticGrid(3, 3, words, 0.5);
+    grid = ColorStaticGrid(3, 3, words, 0.5);
 
     mobileRecallButton?.destroy()
     if (isMobile) {
@@ -85,7 +89,7 @@ function initializeGrid() {
                 hoverColor: PALETTE.darkGray,
                 pressedColor: PALETTE.darkGray,
                 textColor: PALETTE.darkGray,
-                borderColor: PALETTE.green
+                borderColor: PALETTE.grey
             })
     }
 }
@@ -113,7 +117,7 @@ function showRecall() {
                 hoverColor: PALETTE.darkGray,
                 pressedColor: PALETTE.darkGray,
                 textColor: PALETTE.darkGray,
-                borderColor: PALETTE.green
+                borderColor: PALETTE.grey
             })
     }
 }
@@ -132,13 +136,30 @@ function checkAnswer(index) {
         sound_success.play();
     } else {
         sound_fail.play();
+        particleSplat(cameraPos, vec2(15), isMobile ? 25 : 50, PALETTE.grey)
         currentState = GameState.MEMORIZE
         nextCategory();
     }
 }
 
 function showResult() {
+    hideTitleMenu()
     currentState = GameState.RESULT;
+
+    const menu = ColorMenu(cameraPos.add(vec2(0, -7)), vec2(16, 12));
+    menu.columns = 1;
+    menu.addButton('Restart level', () => {
+        menu.hide()
+        menu.destroy()
+        clearSave(game, currentLevel)
+        startGame()
+    });
+
+    menu.addButton('Main menu', () => {
+        menu.hide()
+        menu.destroy()
+        showTitleMenu()
+    });
 }
 
 function showTitleMenu() {
@@ -192,26 +213,26 @@ function showHowTo() {
 }
 
 function drawMemorizeScreen() {
-    drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.white, 0.2, PALETTE.darkGray);
+    drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.grey, 0.2, PALETTE.darkGray);
     grid.draw();
     if (keyIsDown(88)) { // X Key
         const word = words[selectedIndex];
-        drawText(word.definition, cameraPos.add(vec2(0, -8)), 1, PALETTE.white, 0.1, PALETTE.darkGray);
+        drawText(word.definition, cameraPos.add(vec2(0, -8)), 1, PALETTE.grey, 0.1, PALETTE.darkGray);
     }
     if (!isMobile)
-        drawText('Press SPACE to recall', cameraPos.add(vec2(0, -10)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
+        drawText('Press SPACE to recall', cameraPos.add(vec2(0, -10)), 1, PALETTE.grey, 0.1, PALETTE.darkGray);
 }
 
 function drawRecallScreen() {
-    drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.white, 0.2, PALETTE.darkGray);
+    drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.grey, 0.2, PALETTE.darkGray);
     grid.draw();
     const word = words[recallIndex];
-    drawText(word.definition, cameraPos.add(vec2(0, -8)), 1, PALETTE.white, 0.1, PALETTE.darkGray);
+    drawText(word.reading, cameraPos.add(vec2(0, -8)), 0.8, PALETTE.grey, 0.1, PALETTE.darkGray);
+    drawText(word.definition, cameraPos.add(vec2(0, -9.5)), 1.2, PALETTE.grey, 0.1, PALETTE.darkGray);
 }
 
 function drawResultScreen() {
-    drawText(`上手くできたぞ！`, cameraPos.add(vec2(0, 3)), 3, PALETTE.white, 0.2, PALETTE.darkGray);
-    drawText(`Press SPACE to return to menu`, cameraPos.add(vec2(0, -6)), 1, PALETTE.lightGray, 0.1, PALETTE.darkGray);
+    drawText(`上手くできたぞ！`, cameraPos.add(vec2(0, 3)), 3, PALETTE.grey, 0.2, PALETTE.darkGray);
 }
 
 function handleInputUpdate() {
@@ -250,7 +271,6 @@ engineInit(
                 if (keyWasPressed(32)) startGame(currentLevel); // Space
                 break;
             case GameState.RESULT:
-                if (keyWasPressed(32)) showTitleMenu(); // Space
                 break;
         }
     },

@@ -14,7 +14,7 @@ let currentState = GameState.TITLE;
 let currentSentence = '';
 let currentReading = '';
 let currentTranslation = ''
-let titleMenu, resultMenu;
+let titleMenu;
 let currSentIndex, completed = [];
 let currentLevel = '';
 let grid;
@@ -326,7 +326,6 @@ engineInit(
                 drawTypeScreen();
                 break;
             case GameState.RESULT:
-                resultMenu?.render();
                 break;
             case GameState.WIN:
                 drawWinScreen();

@@ -17,7 +17,7 @@ function drawShader() {
         vec2 c = aspect / 2.;
         float f = maskCircle2R(uv, c, r1, r2);
 
-        vec3 col = mix(vec3(.25), vec3(.4, .5, .9), f);
+        vec3 col = mix(vec3(.25), vec3(0.3922, 0.5098, 0.6784), f);
 
         float threshold = 0.1;
         float objectMask = step(threshold, max(max(originalColor.r, originalColor.g), originalColor.b));
