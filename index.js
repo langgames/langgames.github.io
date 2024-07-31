@@ -95,9 +95,57 @@ class ElementBox extends Box {
         this.element = element
         this.boundaryPos = boundaryPos
         this.color = color
+        this.isVisible = true
+
+        this.setupIntersectionObserver()
+    }
+
+
+    setupIntersectionObserver() {
+        let threshold, targetElement = this.element;
+
+        switch (this.boundaryPos) {
+            case 'top':
+                threshold = 1;
+                break;
+            case 'bottom':
+                threshold = 0;
+                break;
+            case 'left':
+                threshold = 1;
+                break;
+            case 'right':
+                threshold = 1;
+                break;
+            case 'middle':
+            default:
+                threshold = 0.5;
+                break;
+        }
+
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: threshold
+        }
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const isVisible = entry.isIntersecting &&
+                    entry.intersectionRect.width > 0 &&
+                    entry.intersectionRect.height > 0;
+
+                if (this.isVisible !== isVisible) {
+                    this.isVisible = isVisible;
+                }
+            });
+        }, options);
+
+        this.observer.observe(targetElement);
     }
 
     collideWithObject(object) {
+        if (!this.isVisible) return
         if (keyWasPressed(40) || object.velocity.y > 0) {
             return false
         }
@@ -106,6 +154,7 @@ class ElementBox extends Box {
     }
 
     render() {
+        if (!this.isVisible) return
         const { x, y, width, height } = this.element.getBoundingClientRect();
 
         switch (this.boundaryPos) {
@@ -130,6 +179,13 @@ class ElementBox extends Box {
 
         this.size = vec2(screenToWorld(vec2(x + width, y + height)).subtract(screenToWorld(vec2(x, y))).x, 4);
         drawRect(this.pos, this.size, this.color)
+    }
+
+    destroy() {
+        super.destroy();
+        if (this.observer) {
+            this.observer.disconnect();
+        }
     }
 }
 
@@ -164,7 +220,7 @@ function gameInit() {
         if (ground)
             new ElementBox(ground, 'top')
 
-        for (const element of [...document.querySelector('.container').children]) {
+        for (const element of [...document.querySelector('#sky').children]) {
             new ElementBox(element, 'bottom', getColor('sky-medium'))
         }
 
@@ -175,7 +231,7 @@ function gameInit() {
             }
 
             new ElementBox(element, 'top')
-            new ElementBox(element, 'middle')
+            new ElementBox(element, 'middle', new Color(0, 0, 0, 0))
             new ElementBox(element, 'bottom')
         }
     }, 100)
