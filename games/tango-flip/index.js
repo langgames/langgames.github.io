@@ -15,7 +15,6 @@ let grid;
 let currentLevel = '';
 let currentCategory = '';
 let words = [];
-let selectedIndex = 0;
 let recallIndex = 0;
 let recallCompleted = []
 let categories = [];
@@ -47,22 +46,37 @@ const ColorMenu = (pos, size, title) => new Menu(pos, size, title, {
     buttonBorderColor: PALETTE.grey
 });
 
-const ColorStaticGrid = (rows, cols, words, margin) => new StaticGrid(rows, cols, words, margin, {
+const onGridMouseDown = (index) => {
+    grid.selectedIndex = index
+    if (currentState === GameState.MEMORIZE) {
+        grid.showReading[index] = true
+    }
+}
+
+const onGridMouseUp = (index) => {
+    if (currentState === GameState.MEMORIZE) {
+        grid.showReading[index] = false
+    } else if (currentState === GameState.RECALL) {
+        checkAnswer(grid.selectedIndex)
+    }
+}
+
+const ColorStaticGrid = (rows, cols, words, margin) => new StaticGrid(rows, cols, words, margin, onGridMouseDown, onGridMouseUp, {
     textColor: PALETTE.grey,
     selectedCellColor: PALETTE.grey
 })
 
 function startGame() {
     mobileGamepad.show()
-
     currentState = GameState.MEMORIZE;
     categoryIndex = nextValidIndex(categories, completed);
     if (categoryIndex === -1) {
         showResult();
         return
     }
+
     initializeGrid();
-    selectedIndex = 0;
+    grid.selectedIndex = 0;
     recallIndex = nextValidIndex(words, []);
     recallCompleted = [];
     hideTitleMenu();
@@ -214,9 +228,8 @@ function showHowTo() {
 
 function drawMemorizeScreen() {
     drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.grey, 0.2, PALETTE.darkGray);
-    grid.draw();
-    if (keyIsDown(88)) { // X Key
-        const word = words[selectedIndex];
+    if (keyIsDown(88) || grid.pressed) { // X Key
+        const word = words[grid.selectedIndex];
         drawText(word.definition, cameraPos.add(vec2(0, -8)), 1, PALETTE.grey, 0.1, PALETTE.darkGray);
     }
     if (!isMobile)
@@ -225,7 +238,6 @@ function drawMemorizeScreen() {
 
 function drawRecallScreen() {
     drawText(currentCategory, cameraPos.add(vec2(0, 8)), 2, PALETTE.grey, 0.2, PALETTE.darkGray);
-    grid.draw();
     const word = words[recallIndex];
     drawText(word.reading, cameraPos.add(vec2(0, -8)), 0.8, PALETTE.grey, 0.1, PALETTE.darkGray);
     drawText(word.definition, cameraPos.add(vec2(0, -9.5)), 1.2, PALETTE.grey, 0.1, PALETTE.darkGray);
@@ -236,10 +248,11 @@ function drawResultScreen() {
 }
 
 function handleInputUpdate() {
-    if (keyWasPressed(37)) selectedIndex = (selectedIndex - 1 + 9) % 9; // Left
-    if (keyWasPressed(39)) selectedIndex = (selectedIndex + 1) % 9; // Right
-    if (keyWasPressed(38)) selectedIndex = (selectedIndex - 3 + 9) % 9; // Up 
-    if (keyWasPressed(40)) selectedIndex = (selectedIndex + 3) % 9; // Down
+    if (grid.pressed) return
+    if (keyWasPressed(37)) grid.selectedIndex = (grid.selectedIndex - 1 + 9) % 9; // Left
+    if (keyWasPressed(39)) grid.selectedIndex = (grid.selectedIndex + 1) % 9; // Right
+    if (keyWasPressed(38)) grid.selectedIndex = (grid.selectedIndex - 3 + 9) % 9; // Up 
+    if (keyWasPressed(40)) grid.selectedIndex = (grid.selectedIndex + 3) % 9; // Down
 }
 
 engineInit(
@@ -249,6 +262,7 @@ engineInit(
         cameraPos = levelSize.scale(0.5);
         initTitleMenu();
         mobileGamepad.registerDefaultButtons();
+        mobileGamepad.setButtonColor('#6482AD')
         drawShader();
     },
     () => {
@@ -256,18 +270,20 @@ engineInit(
             case GameState.TITLE:
                 break;
             case GameState.MEMORIZE:
-                if (keyIsDown(88)) {
-                    grid.setShowReading(selectedIndex, true)
-                    return
+                if (!grid.pressed) {
+                    if (keyIsDown(88)) {
+                        grid.setShowReading(grid.selectedIndex, true)
+                        return
+                    }
+                    grid.setShowReading(grid.selectedIndex, false)
                 }
-                grid.setShowReading(selectedIndex, false)
 
                 handleInputUpdate();
                 if (keyWasPressed(32)) showRecall(); // Space
                 break;
             case GameState.RECALL:
                 handleInputUpdate();
-                if (keyWasPressed(88)) checkAnswer(selectedIndex); // X
+                if (keyWasPressed(88)) checkAnswer(grid.selectedIndex); // X
                 if (keyWasPressed(32)) startGame(currentLevel); // Space
                 break;
             case GameState.RESULT:
