@@ -765,6 +765,7 @@ engineInit(
         initHpBar()
         glInitPostProcess(shader, true)
 
+        mobileGamepad.show()
         mobileGamepad.on('x', (keyDown) => inputData[0][88] = keyDown ? 3 : 4);
         mobileGamepad.on('z', (keyDown) => inputData[0][90] = keyDown ? 3 : 4);
         mobileGamepad.on('left', (keyDown) => inputData[0][37] = keyDown ? 3 : 4);

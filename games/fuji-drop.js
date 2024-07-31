@@ -356,6 +356,8 @@ function gameInit() {
     pauseMenu.addButton('Main Menu', showMainMenu);
     pauseMenu.hide();  // Start with pause menu hidden
 
+    mobileKeyboard.show()
+
     initPostProcess()
 
 }
