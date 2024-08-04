@@ -6,6 +6,7 @@ let particleEmitter;
 let fontImage;
 let coinsCollected = 0
 const messageTimer = new Timer
+const isMobile = checkIsMobile()
 
 const coinColor = getColor('coin')
 const createCoinParticle = pos => new ParticleEmitter(
@@ -173,7 +174,7 @@ function gameRender() {
 
 function gameRenderPost() {
     if (messageTimer.active()) {
-        drawText('上手くできたにゃ〜！', cameraPos, 50, getColor('text'), 5, getColor('ground'))
+        drawText('上手くできたにゃ〜！', cameraPos, isMobile ? 25 : 50, getColor('text'), 5, getColor('ground'))
     }
 }
 
