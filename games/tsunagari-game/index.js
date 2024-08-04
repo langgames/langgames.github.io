@@ -117,11 +117,11 @@ function updateGrid() {
 
 function onGridMouseDown(index) {
     grid.selectedIndex = index;
-    grid.showReading[index] = true;
+    grid.setShowReading(index, true)
 }
 
 function onGridMouseUp(index) {
-    grid.showReading[index] = false;
+    grid.setShowReading(index, false)
 }
 
 function initializeGrid() {
