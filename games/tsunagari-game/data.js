@@ -115,6 +115,88 @@ const compactSentences = {
             "カーテン", "かーてん", "curtains",
             "照明", "しょうめい", "lighting"
         ]
+    ],
+    "LEVEL-2": [
+        ["Time-related Words",
+            "今週", "こんしゅう", "this week",
+            "先月", "せんげつ", "last month",
+            "午後", "ごご", "afternoon",
+            "毎年", "まいとし", "every year",
+            "週末", "しゅうまつ", "weekend",
+            "いつも", "", "always"
+        ],
+        ["Weather",
+            "曇り", "くもり", "cloudy",
+            "霧", "きり", "fog",
+            "湿度", "しつど", "humidity",
+            "暑い", "あつい", "hot",
+            "涼しい", "すずしい", "cool",
+            "蒸し暑い", "むしあつい", "humid"
+        ],
+        ["Daily Activities",
+            "買い物", "かいもの", "shopping",
+            "掃除", "そうじ", "cleaning",
+            "料理", "りょうり", "cooking",
+            "洗濯", "せんたく", "laundry",
+            "散歩", "さんぽ", "walk",
+            "シャワーを浴びる", "しゃわーをあびる", "take a shower"
+        ],
+        ["Adjectives",
+            "便利", "べんり", "convenient",
+            "親切", "しんせつ", "kind",
+            "重要", "じゅうよう", "important",
+            "簡単", "かんたん", "easy",
+            "うるさい", "", "noisy",
+            "きれい", "", "beautiful/clean"
+        ],
+        ["Body Parts",
+            "頭", "あたま", "head",
+            "腕", "うで", "arm",
+            "指", "ゆび", "finger",
+            "背中", "せなか", "back",
+            "肩", "かた", "shoulder",
+            "おなか", "", "stomach"
+        ],
+        ["Family Members",
+            "兄弟", "きょうだい", "siblings",
+            "両親", "りょうしん", "parents",
+            "叔父", "おじ", "uncle",
+            "姪", "めい", "niece",
+            "従兄弟", "いとこ", "cousin",
+            "義理の母", "ぎりのはは", "mother-in-law"
+        ],
+        ["Technology",
+            "充電器", "じゅうでんき", "charger",
+            "プリンター", "ぷりんたー", "printer",
+            "ソフトウェア", "そふとうぇあ", "software",
+            "ウェブサイト", "うぇぶさいと", "website",
+            "パスワード", "ぱすわーど", "password",
+            "データ", "でーた", "data"
+        ],
+        ["Hobbies",
+            "ガーデニング", "がーでにんぐ", "gardening",
+            "写真撮影", "しゃしんさつえい", "photography",
+            "編み物", "あみもの", "knitting",
+            "ジョギング", "じょぎんぐ", "jogging",
+            "釣り", "つり", "fishing",
+            "ボードゲーム", "ぼーどげーむ", "board games"
+        ],
+        ["Locations",
+            "図書館", "としょかん", "library",
+            "美術館", "びじゅつかん", "art museum",
+            "公園", "こうえん", "park",
+            "駐車場", "ちゅうしゃじょう", "parking lot",
+            "交差点", "こうさてん", "intersection",
+            "病院", "びょういん", "hospital"
+        ],
+        ["Travel",
+            "予約", "よやく", "reservation",
+            "観光", "かんこう", "sightseeing",
+            "ガイド", "がいど", "guide",
+            "お土産", "おみやげ", "souvenir",
+            "パスポート", "ぱすぽーと", "passport",
+            "チェックイン", "ちぇっくいん", "check-in"
+        ]
     ]
 };
 
