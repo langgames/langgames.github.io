@@ -4,6 +4,21 @@
 let player;
 let particleEmitter;
 let fontImage;
+let coinsCollected = 0
+const messageTimer = new Timer
+
+const coinColor = getColor('coin')
+const createCoinParticle = pos => new ParticleEmitter(
+    pos, 0,                          // pos, angle
+    5, .1, 100, PI,                  // emitSize, emitTime, emitRate, emiteCone
+    0,                               // tileIndex
+    coinColor, coinColor,                    // colorStartA, colorStartB
+    coinColor.scale(1, 0.5), coinColor.scale(1, 0.5), // colorEndA, colorEndB
+    .3, 24, .1, 0.5, .2,                // time, sizeStart, sizeEnd, speed, angleSpeed
+    .95, .5, .5, PI,                 // damping, angleDamping, gravity, cone
+    .2, .8, 0, 1,                    // fadeRate, randomness, collide, additive
+    0, 20, 0                         // randomColorLinear, renderOrder, localSpace
+);
 
 class Player extends EngineObject {
     constructor(pos) {
@@ -79,116 +94,6 @@ class Player extends EngineObject {
     }
 }
 
-class Box extends EngineObject {
-    constructor(pos, size) {
-        super(pos, size, undefined, 0, new Color(0, 0, 0, 0))
-        this.setCollision()
-        this.mass = 0
-        this.gravityScale = 0
-        this.renderOrder = -1
-    }
-}
-
-class ElementBox extends Box {
-    constructor(element, boundaryPos = 'bottom', color = getColor('ground')) {
-        super()
-        this.element = element
-        this.boundaryPos = boundaryPos
-        this.color = color
-        this.isVisible = true
-
-        this.setupIntersectionObserver()
-    }
-
-
-    setupIntersectionObserver() {
-        let threshold, targetElement = this.element;
-
-        switch (this.boundaryPos) {
-            case 'top':
-                threshold = 1;
-                break;
-            case 'bottom':
-                threshold = 0;
-                break;
-            case 'left':
-                threshold = 1;
-                break;
-            case 'right':
-                threshold = 1;
-                break;
-            case 'middle':
-            default:
-                threshold = 0.5;
-                break;
-        }
-
-        const options = {
-            root: null,
-            rootMargin: '0px',
-            threshold: threshold
-        }
-
-        this.observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const isVisible = entry.isIntersecting &&
-                    entry.intersectionRect.width > 0 &&
-                    entry.intersectionRect.height > 0;
-
-                if (this.isVisible !== isVisible) {
-                    this.isVisible = isVisible;
-                }
-            });
-        }, options);
-
-        this.observer.observe(targetElement);
-    }
-
-    collideWithObject(object) {
-        if (!this.isVisible) return
-        if (keyWasPressed(40) || object.velocity.y > 0) {
-            return false
-        }
-
-        return true
-    }
-
-    render() {
-        if (!this.isVisible) return
-        const { x, y, width, height } = this.element.getBoundingClientRect();
-
-        switch (this.boundaryPos) {
-            case 'top':
-                this.pos = screenToWorld(vec2(x + width / 2, y));
-                break;
-            case 'bottom':
-                this.pos = screenToWorld(vec2(x + width / 2, y + height));
-                break;
-            case 'left':
-                this.pos = screenToWorld(vec2(x, y + height / 2));
-                break;
-            case 'right':
-                this.pos = screenToWorld(vec2(x + width, y + height / 2));
-                break;
-            case 'middle':
-                this.pos = screenToWorld(vec2(x + width / 2, y + height / 2));
-                break;
-            default:
-                return null;
-        }
-
-        this.size = vec2(screenToWorld(vec2(x + width, y + height)).subtract(screenToWorld(vec2(x, y))).x, 4);
-        drawRect(this.pos, this.size, this.color)
-    }
-
-    destroy() {
-        super.destroy();
-        if (this.observer) {
-            this.observer.disconnect();
-        }
-    }
-}
-
 function gameInit() {
     objectMaxSpeed = 100
     cameraScale = 1
@@ -235,6 +140,20 @@ function gameInit() {
             new ElementBox(element, 'middle', new Color(0, 0, 0, 0))
             new ElementBox(element, 'bottom')
         }
+
+        for (const element of [...document.querySelectorAll('.coin')]) {
+            const e = new ElementBox(element, 'full')
+            new Sound([, , 295, .03, .06, .16, 1, .4, , , 122, .09, , , , , , .62, .04, , -1469]).play()
+            e.onFullCollision = () => {
+                e.element.style.visibility = 'hidden'
+                createCoinParticle(e.pos)
+                e.destroy()
+                ++coinsCollected
+                if (coinsCollected === 2)
+                    messageTimer.set(5)
+                return false;
+            }
+        }
     }, 100)
 }
 
@@ -245,9 +164,17 @@ function gameUpdatePost() {
 }
 
 function gameRender() {
+    if (messageTimer.active()) {
+        for (let i = 0; i < 20; i++) {
+            createCoinParticle(getRandomPosition(cameraPos, mainCanvasSize));
+        }
+    }
 }
 
 function gameRenderPost() {
+    if (messageTimer.active()) {
+        drawText('上手くできたにゃ〜！', cameraPos, 50, getColor('text'), 5, getColor('ground'))
+    }
 }
 
 // Start the LittleJS engine with our custom init function
