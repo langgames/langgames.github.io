@@ -247,14 +247,6 @@ function drawResultScreen() {
     drawText(`上手くできたぞ！`, cameraPos.add(vec2(0, 3)), 3, PALETTE.grey, 0.2, PALETTE.darkGray);
 }
 
-function handleInputUpdate() {
-    if (grid.pressed) return
-    if (keyWasPressed(37)) grid.selectedIndex = (grid.selectedIndex - 1 + 9) % 9; // Left
-    if (keyWasPressed(39)) grid.selectedIndex = (grid.selectedIndex + 1) % 9; // Right
-    if (keyWasPressed(38)) grid.selectedIndex = (grid.selectedIndex - 3 + 9) % 9; // Up 
-    if (keyWasPressed(40)) grid.selectedIndex = (grid.selectedIndex + 3) % 9; // Down
-}
-
 engineInit(
     () => {
         canvasFixedSize = vec2(1280, 720);
@@ -278,7 +270,6 @@ engineInit(
                     grid.setShowReading(grid.selectedIndex, false)
                 }
 
-                handleInputUpdate();
                 if (keyWasPressed(32)) showRecall(); // Space
                 break;
             case GameState.RECALL:
