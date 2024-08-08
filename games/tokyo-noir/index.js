@@ -2,6 +2,7 @@ let imageSlider;
 let annotatedDialog;
 let currentSceneIndex = 0;
 let currentImage = null;
+const isMobile = mobileGamepad.checkIsMobile()
 
 function updateArrowVisibility() {
     leftArrow.style.visibility = currentSceneIndex > 0 ? 'visible' : 'hidden';
@@ -26,6 +27,10 @@ async function init() {
         text-align: center;
         color: white;
     `;
+    if (isMobile) {
+        textContainer.style.bottom = undefined
+        textContainer.style.top = '20px'
+    }
 
     // Define text outline style
     const textOutlineStyle = `
@@ -86,7 +91,11 @@ async function loadScene(index) {
         currentImage = scene.image
     }
 
-    annotatedDialog.show(scene.words, 'bottom');
+    annotatedDialog.show(scene.words, isMobile ? 'top' : 'bottom');
+    if (isMobile) {
+        annotatedDialog.dialog.style.bottom = undefined
+        annotatedDialog.dialog.style.top = '20px'
+    }
 
     updateArrowVisibility();
 }
@@ -94,7 +103,7 @@ async function loadScene(index) {
 function createArrows() {
     const arrowStyle = `
         position: fixed;
-        bottom: 0;
+        bottom: ${isMobile ? '30%' : 0};
         transform: translateY(-50%);
         font-size: 48px;
         color: white;
@@ -102,6 +111,7 @@ function createArrows() {
         border: none;
         padding: 10px;
         cursor: pointer;
+        pointer-events: auto;
     `;
 
     leftArrow = document.createElement('button');
@@ -128,3 +138,10 @@ window.addEventListener('resize', () => {
         imageSlider.draw();
     }
 });
+
+const keys = { x: 'x', z: 'z', left: 'arrowleft', down: 'arrowdown', right: 'arrowright', up: 'arrowup' };
+Object.entries(keys).forEach(([btn, key]) =>
+    mobileGamepad.on(btn, down => document.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { key })))
+);
+mobileGamepad.setButtonColor('#6482AD')
+mobileGamepad.show()
