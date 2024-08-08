@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+    <title>TEST</title>
+    <style>
+        @font-face {
+            font-family: 'Pixelify Sans';
+            src: url('../../fonts/pixelify-sans/PixelifySans-VariableFont_wght.ttf') format('truetype-variations');
+            font-weight: 100 900;
+        }
+
+        body {
+            color: var(--text);
+            font-family: 'Pixelify Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            background: linear-gradient(to bottom,
+                    #000099 0%,
+                    /* Moderately dark blue */
+                    #000099 20%,
+                    /* Moderately dark blue */
+                    #000066 20%,
+                    /* Dark blue */
+                    #000066 40%,
+                    /* Dark blue */
+                    #000033 40%,
+                    /* Very dark blue */
+                    #000033 60%,
+                    /* Very dark blue */
+                    #000000 60%,
+                    /* Black */
+                    #000000 100%) !important;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="crt">
+    <script src="../../lib/vanilla-ui.js"></script>
+    <script src="./data.js"></script>
+    <script src="./index.js"></script>
+</body>
+
+</html>
