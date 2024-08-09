@@ -58,6 +58,7 @@ async function init() {
     startText.style.cssText = `
         font-size: 36px;
         font-weight: bold;
+        margin-top: ${isMobile ? '100px' : 0}
         ${textOutlineStyle}
     `;
     textContainer.appendChild(startText);
@@ -72,6 +73,9 @@ async function init() {
 
         // Run these functions when the screen is clicked
         annotatedDialog = new AnnotatedDialog();
+
+        // imageSlider.onClick = () => annotatedDialog.toggleVisibility()
+
         createArrows();
         await loadScene(0);
     };
