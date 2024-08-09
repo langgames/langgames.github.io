@@ -4,42 +4,7 @@ let crossword;
 let gameState = 'playing'; // 'playing' or 'completed'
 let levelSize;
 
-const samplePuzzleData = {
-    "answers": {
-        "across": [
-            "ございます",
-        ],
-        "down": [
-            "あさごはん",
-        ]
-    },
-    "clues": {
-        "across": [
-            "2. To exist politely",
-        ],
-        "down": [
-            "1. Morning meal"
-        ]
-    },
-    "grid": [
-        "あ", ".", ".", ".", ".",
-        "さ", ".", ".", ".", ".",
-        "ご", "ざ", "い", "ま", "す",
-        "は", ".", ".", ".", ".",
-        "ん", ".", ".", ".", "."
-    ],
-    "gridnums": [
-        1, 0, 0, 0, 0,
-        0, 0, 0, 0, 0,
-        2, 0, 0, 0, 0,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0,
-    ],
-    "size": {
-        "cols": 5,
-        "rows": 5
-    }
-}
+const samplePuzzleData = puzzles.n5.family
 
 function gameInit() {
     fontDefault = 'Jiskan24'
