@@ -6,9 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
     <title>クロスWORD</title>
+    <style>
+        @font-face {
+            font-family: 'Jiskan24';
+            src: url('../../fonts/jf-dot/JF-Dot-jiskan24.ttf');
+            font-weight: 100 900;
+        }
+
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 90000;
+        }
+    </style>
 </head>
 
-<body>
+<body class="crt">
     <script src="../../littlejs/littlejs.min.js"></script>
     <script src="../../lib/utils.js"></script>
     <script src="../../lib/ui.js"></script>

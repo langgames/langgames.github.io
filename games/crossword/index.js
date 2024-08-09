@@ -42,6 +42,7 @@ const samplePuzzleData = {
 }
 
 function gameInit() {
+    fontDefault = 'Jiskan24'
     inputWASDEmulateDirection = false
 
     // Set up the canvas

@@ -21,8 +21,12 @@ class Crossword extends EngineObject {
         this.direction = 'across';
 
         if (!this.getActiveClue()) {
-            this.direction = 'down'
+            this.swapDirection()
         }
+    }
+
+    swapDirection() {
+        this.direction = this.direction === 'across' ? 'down' : 'across'
     }
 
     findFirstClueNumber() {
@@ -96,6 +100,10 @@ class Crossword extends EngineObject {
             if (cellX >= 0 && cellX < this.cols && cellY >= 0 && cellY < this.rows) {
                 this.selectedCell = vec2(cellX, cellY);
                 this.updateCurrentClueNumber();
+                if (!this.getActiveClue()) {
+                    this.swapDirection()
+                    this.updateCurrentClueNumber();
+                }
             }
         }
 
@@ -277,8 +285,12 @@ class KanaCrossword extends Crossword {
             const cellY = this.rows - 1 - Math.floor(clickPos.y / this.cellSize.y);
             if (cellX >= 0 && cellX < this.cols && cellY >= 0 && cellY < this.rows) {
                 this.selectedCell = vec2(cellX, cellY);
-                this.updateCurrentClueNumber();
                 this.kanaInput = ''; // Clear kana input buffer on cell change
+                this.updateCurrentClueNumber();
+                if (!this.getActiveClue()) {
+                    this.swapDirection()
+                    this.updateCurrentClueNumber();
+                }
             }
         }
 
