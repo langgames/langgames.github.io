@@ -11,6 +11,7 @@ let words = [];
 let completedCategories = [];
 let submitButton;
 let categories = []
+const isMobile = checkIsMobile()
 
 const GameState = {
     TITLE: 0,
@@ -173,11 +174,16 @@ function removeTitleMenu() {
 function initializeTitleMenu() {
     if (titleMenu) titleMenu.destroy();
     mobileGamepad?.hide()
-    titleMenu = ColorMenu(cameraPos, vec2(20, 14), 'つながりGAME');
+    const title = isMobile ? 'つながり\nGAME' : 'つながりGAME'
+    const titleSize = isMobile ? 2 : 3
+    const pos = cameraPos.add(vec2(0, isMobile ? 4 : 0))
+    titleMenu = ColorMenu(pos, vec2(20, 14), title);
     titleMenu.addButton('How to Play', () => {
         removeTitleMenu()
         showHowToPlay()
     });
+    titleMenu.titleSize = titleSize
+    if (isMobile) titleMenu.columns = 2
 
     for (const level in compactSentences) {
         titleMenu.addButton(level.toUpperCase(), () => startGame(level));
@@ -192,16 +198,16 @@ function showHowToPlay() {
 function initializeHowToPlayMenu() {
     const instructions = [
         "1. Find groups of four related words.",
-        "2. Select words by clicking or pressing 'Z'.",
+        "2. Select words by \nclicking or pressing 'Z'.",
         "3. Press 'X' to view word info.",
-        "4. Click 'Submit' when you've selected four words.",
+        "4. Click 'Submit' when \nyou've selected four words.",
         "5. Correct groups move to the top.",
         "6. Complete all four groups to win!",
     ].join('\n');
 
     howToPlayMenu = ColorMenu(cameraPos, vec2(20, 14), 'How to Play');
     howToPlayMenu.columns = 1;
-    howToPlayMenu.addTextBlock(instructions, 1.2);
+    howToPlayMenu.addTextBlock(instructions, 1);
     howToPlayMenu.addButton('Back', () => {
         howToPlayMenu?.hide()
         howToPlayMenu?.destroy()
@@ -227,7 +233,7 @@ function initializeResultMenu() {
 function drawWord() {
     if (keyIsDown(88) || grid.pressed) { // X Key
         const word = words[grid.selectedIndex];
-        drawText(word.definition, cameraPos.add(vec2(0, -8)), 1, PALETTE.grey, 0.1, PALETTE.darkGray);
+        drawText(word.definition, cameraPos.add(vec2(0, 10)), 1, PALETTE.grey, 0.1, PALETTE.darkGray);
     }
 }
 
@@ -253,7 +259,7 @@ function drawCompleted() {
 engineInit(
     () => {
         // Initialize game
-        canvasFixedSize = vec2(1280, 720);
+        canvasFixedSize = isMobile ? vec2(600, 800) : vec2(1280, 720);
         levelSize = vec2(20);
         cameraPos = levelSize.scale(0.5);
         showTitleMenu();
